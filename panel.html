@@ -1,0 +1,338 @@
+<<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel EPS ESE NORTE — Citas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde:    #0a6e4f;
+    --verde2:   #12a374;
+    --verde3:   #e6f7f2;
+    --gris:     #f4f6f5;
+    --texto:    #1a2e25;
+    --sub:      #5a7a6e;
+    --borde:    #d0e8df;
+    --blanco:   #ffffff;
+    --rojo:     #c0392b;
+    --amarillo: #e67e22;
+    --sombra:   0 2px 16px rgba(10,110,79,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--gris); color: var(--texto); min-height: 100vh; }
+  header { background: var(--verde); color: white; padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+  header h1 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; letter-spacing: 0.01em; }
+  header h1 span { color: var(--verde2); }
+  .header-right { display: flex; align-items: center; gap: 16px; font-size: 0.85rem; opacity: 0.9; }
+  #reloj { font-size: 0.95rem; font-weight: 500; background: rgba(255,255,255,0.12); padding: 4px 12px; border-radius: 20px; }
+  .dot-live { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; margin-right: 4px; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .contenedor { max-width: 1300px; margin: 0 auto; padding: 28px 24px; }
+  .filtros { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; align-items: center; }
+  .filtros select, .filtros input { padding: 8px 14px; border: 1.5px solid var(--borde); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; background: white; color: var(--texto); outline: none; transition: border-color 0.2s; min-width: 160px; }
+  .filtros select:focus, .filtros input:focus { border-color: var(--verde2); }
+  .btn { padding: 8px 18px; border-radius: 8px; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-verde { background: var(--verde); color: white; }
+  .btn-verde:hover { background: var(--verde2); }
+  .btn-outline { background: white; color: var(--verde); border: 1.5px solid var(--verde); }
+  .btn-outline:hover { background: var(--verde3); }
+  .tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .tarjeta { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--sombra); border-left: 4px solid var(--verde2); }
+  .tarjeta.rojo { border-left-color: var(--rojo); }
+  .tarjeta.amarillo { border-left-color: var(--amarillo); }
+  .tarjeta-num { font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: var(--verde); line-height: 1; }
+  .tarjeta.rojo .tarjeta-num { color: var(--rojo); }
+  .tarjeta.amarillo .tarjeta-num { color: var(--amarillo); }
+  .tarjeta-label { font-size: 0.82rem; color: var(--sub); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tabla-wrap { background: white; border-radius: 14px; box-shadow: var(--sombra); overflow: hidden; }
+  .tabla-header { padding: 18px 24px; border-bottom: 1px solid var(--borde); display: flex; justify-content: space-between; align-items: center; }
+  .tabla-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.15rem; color: var(--texto); }
+  .actualiza-info { font-size: 0.8rem; color: var(--sub); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--verde3); color: var(--verde); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 16px; text-align: left; }
+  tbody tr { border-bottom: 1px solid #f0f5f3; transition: background 0.15s; }
+  tbody tr:hover { background: #f7fbf9; }
+  tbody td { padding: 13px 16px; font-size: 0.9rem; color: var(--texto); vertical-align: middle; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.76rem; font-weight: 600; }
+  .badge-verde    { background: #dcfce7; color: #166534; }
+  .badge-rojo     { background: #fee2e2; color: #991b1b; }
+  .badge-amarillo { background: #fef9c3; color: #854d0e; }
+  .badge-azul     { background: #dbeafe; color: #1e40af; }
+  .mayor-icon { color: var(--verde2); font-weight: 600; font-size: 0.85rem; }
+  .sede-chip { display: inline-block; padding: 2px 9px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; }
+  .sede-vr { background: #fce7f3; color: #9d174d; }
+  .sede-pt { background: #dbeafe; color: #1e40af; }
+  .sede-gu { background: #dcfce7; color: #166534; }
+  .vacio { text-align: center; padding: 60px 20px; color: var(--sub); }
+  .vacio-icon { font-size: 3rem; margin-bottom: 12px; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--borde); border-top-color: var(--verde2); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #toast { position: fixed; bottom: 24px; right: 24px; background: var(--verde); color: white; padding: 12px 20px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.2); transform: translateY(80px); opacity: 0; transition: all 0.3s ease; z-index: 999; }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  @media (max-width: 768px) {
+    .tarjetas { grid-template-columns: repeat(2, 1fr); }
+    table { font-size: 0.82rem; }
+    thead th, tbody td { padding: 10px 10px; }
+    .filtros { gap: 8px; }
+    .filtros select, .filtros input { min-width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Panel <span>EPS ESE NORTE</span> — Citas</h1>
+  <div class="header-right">
+    <span><span class="dot-live"></span>En vivo</span>
+    <span id="reloj">--:--:--</span>
+  </div>
+</header>
+
+<div class="contenedor">
+
+  <!-- FILTROS -->
+  <div class="filtros">
+    <select id="filtroSede">
+      <option value="">Todas las sedes</option>
+      <option value="Villa Rica">Villa Rica</option>
+      <option value="Puerto Tejada">Puerto Tejada</option>
+      <option value="Guachene">Guachene</option>
+    </select>
+
+    <select id="filtroEspecialidad">
+      <option value="">Todas las especialidades</option>
+      <option value="medicina_general">Medicina General</option>
+      <option value="odontologia">Odontologia</option>
+      <option value="pediatria">Pediatria</option>
+    </select>
+
+    <!-- NUEVO: filtro de doctor cargado dinamicamente -->
+    <select id="filtroDoctor">
+      <option value="">Todos los doctores</option>
+    </select>
+
+    <input type="date" id="filtroFecha">
+
+    <button class="btn btn-verde" onclick="cargarCitas()">Buscar</button>
+    <button class="btn btn-outline" onclick="limpiarFiltros()">Limpiar</button>
+    <button class="btn btn-outline" onclick="exportarExcel()">Exportar Excel</button>
+  </div>
+
+  <!-- TARJETAS RESUMEN -->
+  <div class="tarjetas">
+    <div class="tarjeta">
+      <div class="tarjeta-num" id="totalCitas">—</div>
+      <div class="tarjeta-label">Total citas</div>
+    </div>
+    <div class="tarjeta amarillo">
+      <div class="tarjeta-num" id="citasHoy">—</div>
+      <div class="tarjeta-label">Citas hoy</div>
+    </div>
+    <div class="tarjeta">
+      <div class="tarjeta-num" id="citasMayor">—</div>
+      <div class="tarjeta-label">Adultos mayores</div>
+    </div>
+    <div class="tarjeta rojo">
+      <div class="tarjeta-num" id="citasCanceladas">—</div>
+      <div class="tarjeta-label">Canceladas</div>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="tabla-wrap">
+    <div class="tabla-header">
+      <h2>Registro de citas</h2>
+      <span class="actualiza-info" id="ultimaActualizacion">Actualizando...</span>
+    </div>
+    <div id="tablaContenido">
+      <div class="vacio">
+        <div class="spinner"></div> Cargando citas...
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API_URL = "http://localhost:3001";
+
+// ── Reloj ──
+function actualizarReloj() {
+  document.getElementById("reloj").textContent = new Date().toLocaleTimeString("es-CO");
+}
+setInterval(actualizarReloj, 1000);
+actualizarReloj();
+
+// ── Cargar lista de doctores en el select ──
+async function cargarDoctores() {
+  try {
+    const res      = await fetch(`${API_URL}/api/doctores`);
+    const doctores = await res.json();
+    const select   = document.getElementById("filtroDoctor");
+    const nombres  = [...new Set(doctores.map(d => d.nombre.trim()))].sort();
+    nombres.forEach(nombre => {
+      const opt     = document.createElement("option");
+      opt.value     = nombre;
+      opt.textContent = nombre;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error("No se pudieron cargar los doctores:", err);
+  }
+}
+
+// ── Cargar citas desde la API ──
+async function cargarCitas() {
+  try {
+    const sede         = document.getElementById("filtroSede").value;
+    const especialidad = document.getElementById("filtroEspecialidad").value;
+    const doctor       = document.getElementById("filtroDoctor").value;
+    const fecha        = document.getElementById("filtroFecha").value;
+
+    let url = `${API_URL}/api/citas?`;
+    if (sede)         url += `sede=${encodeURIComponent(sede)}&`;
+    if (especialidad) url += `especialidad=${encodeURIComponent(especialidad)}&`;
+    if (doctor)       url += `doctor=${encodeURIComponent(doctor)}&`;
+    if (fecha)        url += `fecha=${encodeURIComponent(fecha)}&`;
+
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    actualizarResumen(data);
+    renderTabla(data.citas || []);
+
+    document.getElementById("ultimaActualizacion").textContent =
+      `Ultima actualizacion: ${new Date().toLocaleTimeString("es-CO")}`;
+  } catch (err) {
+    console.error("Error cargando citas:", err);
+    document.getElementById("tablaContenido").innerHTML = `
+      <div class="vacio">
+        <div class="vacio-icon">⚠️</div>
+        <p>No se pudo conectar al servidor.<br>
+        Verifica que el servidor este corriendo en ${API_URL}</p>
+      </div>`;
+  }
+}
+
+// ── Actualizar tarjetas resumen ──
+function actualizarResumen(data) {
+  document.getElementById("totalCitas").textContent      = data.total      || 0;
+  document.getElementById("citasHoy").textContent        = data.hoy        || 0;
+  document.getElementById("citasMayor").textContent      = data.mayores    || 0;
+  document.getElementById("citasCanceladas").textContent = data.canceladas || 0;
+}
+
+const ESP_NOMBRE = {
+  medicina_general: "Medicina General",
+  odontologia:      "Odontologia",
+  pediatria:        "Pediatria",
+};
+
+function sedeClass(sede) {
+  if (!sede) return "";
+  if (sede.includes("Villa"))   return "sede-vr";
+  if (sede.includes("Puerto"))  return "sede-pt";
+  if (sede.includes("Guachen")) return "sede-gu";
+  return "";
+}
+
+// ── Renderizar tabla ──
+function renderTabla(citas) {
+  if (!citas.length) {
+    document.getElementById("tablaContenido").innerHTML = `
+      <div class="vacio">
+        <div class="vacio-icon">📭</div>
+        <p>No hay citas para mostrar</p>
+      </div>`;
+    return;
+  }
+
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>N</th><th>Sede</th><th>Tipo Doc</th><th>Documento</th>
+          <th>Especialidad</th><th>Doctor</th><th>Fecha</th><th>Hora</th>
+          <th>Adulto Mayor</th><th>Estado</th><th>Agendada</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+  citas.forEach((c, i) => {
+    const fecha    = new Date(c.fecha).toLocaleDateString("es-CO");
+    const agendada = new Date(c.creadaEn).toLocaleString("es-CO");
+    const esp      = ESP_NOMBRE[c.especialidad] || c.especialidad;
+    const estadoBadge = c.estado === "activa"
+      ? `<span class="badge badge-verde">Activa</span>`
+      : `<span class="badge badge-rojo">Cancelada</span>`;
+    const mayorBadge = c.esMayorDe60
+      ? `<span class="mayor-icon">✔ Si</span>`
+      : `<span style="color:#aaa">No</span>`;
+    const sedeBadge = c.sede
+      ? `<span class="sede-chip ${sedeClass(c.sede)}">${c.sede}</span>`
+      : `<span style="color:#aaa">—</span>`;
+
+    html += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${sedeBadge}</td>
+        <td><span class="badge badge-azul">${c.tipoDoc || "CC"}</span></td>
+        <td><strong>${c.userId}</strong></td>
+        <td>${esp}</td>
+        <td>${c.nombreDoctor}</td>
+        <td>${fecha}</td>
+        <td><strong>${c.horario}</strong></td>
+        <td>${mayorBadge}</td>
+        <td>${estadoBadge}</td>
+        <td style="color:#888;font-size:0.82rem">${agendada}</td>
+      </tr>`;
+  });
+
+  html += `</tbody></table>`;
+  document.getElementById("tablaContenido").innerHTML = html;
+}
+
+// ── Limpiar filtros ──
+function limpiarFiltros() {
+  document.getElementById("filtroSede").value         = "";
+  document.getElementById("filtroEspecialidad").value = "";
+  document.getElementById("filtroDoctor").value       = "";
+  document.getElementById("filtroFecha").value        = "";
+  cargarCitas();
+}
+
+// ── Exportar Excel — pasa todos los filtros activos ──
+function exportarExcel() {
+  const sede         = document.getElementById("filtroSede").value;
+  const especialidad = document.getElementById("filtroEspecialidad").value;
+  const doctor       = document.getElementById("filtroDoctor").value;
+  const fecha        = document.getElementById("filtroFecha").value;
+
+  let url = `${API_URL}/api/exportar?`;
+  if (sede)         url += `sede=${encodeURIComponent(sede)}&`;
+  if (especialidad) url += `especialidad=${encodeURIComponent(especialidad)}&`;
+  if (doctor)       url += `doctor=${encodeURIComponent(doctor)}&`;
+  if (fecha)        url += `fecha=${encodeURIComponent(fecha)}&`;
+
+  mostrarToast(doctor ? `Exportando citas de ${doctor}...` : "Exportando todas las citas...");
+  window.open(url, "_blank");
+}
+
+// ── Toast ──
+function mostrarToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+// ── Inicio ──
+cargarDoctores();
+cargarCitas();
+setInterval(cargarCitas, 30000);
+</script>
+</body>
+</html>
